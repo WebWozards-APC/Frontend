@@ -1,25 +1,34 @@
-import React from "react";
+import { Link } from "react-router-dom";
 
-const Navbar = () => {
+function Navbar() {
   return (
-    <nav className="bg-white shadow-md fixed w-full top-0 left-0 z-50">
-      <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
-        <h1 className="text-2xl font-bold text-[#4A90E2]">Blogify</h1>
-        <ul className="hidden md:flex space-x-6 text-gray-700 font-medium">
-          {["Home", "Blogs", "About", "Contact", "Login/Register"].map(
-            (item) => (
-              <li
-                key={item}
-                className="hover:text-[#4A90E2] cursor-pointer transition-colors"
-              >
-                {item}
-              </li>
-            )
-          )}
-        </ul>
+    <nav className="bg-white border-b border-gray-100 sticky top-0 z-50">
+      <div className="max-w-6xl mx-auto px-6 py-4 flex justify-between items-center">
+        <div className="text-2xl font-bold text-indigo-600">
+          Blogify
+        </div>
+        <div className="hidden md:flex space-x-8">
+          <Link to="/" className="text-gray-600 hover:text-gray-900 transition">
+            Home
+          </Link>
+          <Link to="/blogs" className="text-gray-600 hover:text-gray-900 transition">
+            Blogs
+          </Link>
+        </div>
+        <div className="flex items-center space-x-4">
+          <Link to="/login" className="text-gray-600 hover:text-gray-900 transition">
+            Sign In
+          </Link>
+          <Link
+            to="/register"
+            className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition"
+          >
+            Get Started
+          </Link>
+        </div>
       </div>
     </nav>
   );
-};
+}
 
 export default Navbar;
