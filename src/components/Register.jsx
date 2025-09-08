@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom"; // ✅ import navigate
 import axios from "axios";
 
 function Register() {
@@ -9,6 +10,7 @@ function Register() {
     bio: "",
   });
   const [message, setMessage] = useState("");
+  const navigate = useNavigate(); // ✅ hook to navigate
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -17,10 +19,15 @@ function Register() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.post("http://localhost:8080/api/users/register", form);
-      setMessage("✅ Registered Successfully! You can now login.");
+      await axios.post("http://localhost:8080/api/users/register", form, {
+        withCredentials: false,
+      });
+      // ✅ Redirect to blogs after successful registration
+      navigate("/blogs");
     } catch (err) {
-      setMessage("❌ " + (err.response?.data?.message || "Registration failed"));
+      setMessage(
+        "❌ " + (err.response?.data?.message || "Registration failed")
+      );
     }
   };
 
@@ -77,7 +84,7 @@ function Register() {
           Register
         </button>
 
-        {message && <p className="mt-3 text-center">{message}</p>}
+        {message && <p className="mt-3 text-center text-red-500">{message}</p>}
       </form>
     </div>
   );
