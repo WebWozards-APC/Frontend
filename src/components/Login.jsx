@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
 
@@ -6,6 +6,8 @@ function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [shouldRedirect, setShouldRedirect] = useState(false);
+
   const navigate = useNavigate();
   const location = useLocation();
   const from = location.state?.from?.pathname || "/blogs";
@@ -20,24 +22,22 @@ function Login() {
         password,
       });
 
-      // Accept login if backend returns id and roles (no token logic)
+      // Accept login if backend returns id and roles
       if (res.data && res.data.id && res.data.roles) {
-        // Optionally store user info if needed
         localStorage.setItem("userId", res.data.id);
         localStorage.setItem("roles", JSON.stringify(res.data.roles));
-        localStorage.setItem("token", "logged-in"); // Set dummy token for RequireAuth
-        navigate("/blogs", { replace: true });
+        localStorage.setItem("token", "logged-in"); // dummy token for RequireAuth
+
+        // Update navbar in case it's listening
+        window.dispatchEvent(new Event("storage"));
+
+        setShouldRedirect(true); // ✅ trigger redirect in useEffect
       } else {
-        setError(
-          res.data && res.data.message
-            ? res.data.message
-            : "Unexpected response from server"
-        );
+        setError(res.data?.message || "Unexpected response from server");
         console.error("Login response:", res.data);
       }
     } catch (err) {
       if (err.response) {
-        // Show backend error message if present
         setError(
           err.response.data?.message ||
             (err.response.status === 401
@@ -52,6 +52,13 @@ function Login() {
     }
   };
 
+  // ✅ Redirect handled correctly with useEffect
+  useEffect(() => {
+    if (shouldRedirect) {
+      navigate(from, { replace: true });
+    }
+  }, [shouldRedirect, navigate, from]);
+
   return (
     <div className="flex justify-center items-center h-[80vh]">
       <form
@@ -60,6 +67,7 @@ function Login() {
       >
         <h2 className="text-2xl font-bold mb-4 text-center">Login</h2>
         {error && <p className="text-red-500 mb-2 text-center">{error}</p>}
+
         <input
           type="email"
           placeholder="Email"
@@ -68,6 +76,7 @@ function Login() {
           onChange={(e) => setEmail(e.target.value)}
           required
         />
+
         <input
           type="password"
           placeholder="Password"
@@ -76,6 +85,7 @@ function Login() {
           onChange={(e) => setPassword(e.target.value)}
           required
         />
+
         <button
           type="submit"
           className="w-full bg-indigo-600 text-white py-2 rounded hover:bg-indigo-700"

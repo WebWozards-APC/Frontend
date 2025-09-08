@@ -5,6 +5,7 @@ import { User } from "lucide-react"; // Profile icon
 function Navbar() {
   const navigate = useNavigate();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [shouldLogout, setShouldLogout] = useState(false);
 
   useEffect(() => {
     // check login status at mount
@@ -16,6 +17,22 @@ function Navbar() {
 
     return () => window.removeEventListener("storage", handler);
   }, []);
+
+  // Redirect after logout using useEffect
+  useEffect(() => {
+    if (shouldLogout) {
+      navigate("/login", { replace: true });
+      setShouldLogout(false);
+    }
+  }, [shouldLogout, navigate]);
+
+  // Redirect after logout using useEffect
+  useEffect(() => {
+    if (shouldLogout) {
+      navigate("/login", { replace: true });
+      setShouldLogout(false);
+    }
+  }, [shouldLogout, navigate]);
 
   return (
     <nav className="bg-white border-b border-gray-100 sticky top-0 z-50">
@@ -60,7 +77,8 @@ function Navbar() {
                   localStorage.removeItem("userId");
                   localStorage.removeItem("roles");
                   setIsLoggedIn(false);
-                  navigate("/login");
+                  window.dispatchEvent(new Event("storage")); // Force Navbar to update
+                  setShouldLogout(true);
                 }}
                 className="ml-2 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition"
               >
