@@ -14,7 +14,7 @@ function Login() {
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    setError(""); // clear old error
+    setError("");
 
     try {
       const res = await axios.post("http://localhost:8080/api/users/login", {
@@ -23,10 +23,9 @@ function Login() {
       });
 
       if (res.data && res.data.id && res.data.roles) {
-        // ✅ Store all required items in localStorage
         localStorage.setItem("userId", res.data.id);
         localStorage.setItem("roles", JSON.stringify(res.data.roles));
-        localStorage.setItem("token", "logged-in"); // dummy token for RequireAuth
+        localStorage.setItem("token", "logged-in"); // dummy token
         if (res.data.email) {
           localStorage.setItem("email", res.data.email);
         }
@@ -34,13 +33,10 @@ function Login() {
           localStorage.setItem("name", res.data.name);
         }
 
-        // Update navbar in case it's listening
-        window.dispatchEvent(new Event("storage"));
-
+        window.dispatchEvent(new Event("storage")); // update navbar
         setShouldRedirect(true);
       } else {
         setError(res.data?.message || "Unexpected response from server");
-        console.error("Login response:", res.data);
       }
     } catch (err) {
       if (err.response) {
@@ -50,10 +46,8 @@ function Login() {
               ? "Invalid email or password"
               : `Error: ${err.response.status}`)
         );
-        console.error("Login error response:", err.response.data);
       } else {
         setError("Something went wrong. Please try again.");
-        console.error("Login error:", err);
       }
     }
   };
@@ -68,35 +62,53 @@ function Login() {
     <div className="flex justify-center items-center h-[80vh]">
       <form
         onSubmit={handleLogin}
-        className="bg-white p-6 rounded-lg shadow-md w-80"
+        className="bg-white text-gray-500 max-w-[350px] mx-4 md:p-6 p-4 text-left text-sm rounded-xl shadow-[0px_0px_10px_0px] shadow-black/10"
       >
-        <h2 className="text-2xl font-bold mb-4 text-center">Login</h2>
+        <h2 className="text-2xl font-semibold mb-6 text-center text-gray-800">
+          Login Now
+        </h2>
+
         {error && <p className="text-red-500 mb-2 text-center">{error}</p>}
 
         <input
+          id="email"
+          className="w-full border my-3 border-gray-500/30 outline-none rounded-full py-2.5 px-4"
           type="email"
-          placeholder="Email"
-          className="w-full p-2 mb-3 border rounded"
+          placeholder="Enter your email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
         />
 
         <input
+          id="password"
+          className="w-full border mt-1 border-gray-500/30 outline-none rounded-full py-2.5 px-4"
           type="password"
-          placeholder="Password"
-          className="w-full p-2 mb-3 border rounded"
+          placeholder="Enter your password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           required
         />
 
+        <div className="text-right py-4">
+          <a className="text-blue-600 underline" href="#">
+            Forgot Password
+          </a>
+        </div>
+
         <button
           type="submit"
-          className="w-full bg-indigo-600 text-white py-2 rounded hover:bg-indigo-700"
+          className="w-full mb-3 bg-indigo-500 hover:bg-indigo-600/90 active:scale-95 transition py-2.5 rounded-full text-white"
         >
-          Login
+          Log in
         </button>
+
+        <p className="text-center mt-4">
+          Don’t have an account?{" "}
+          <a href="/register" className="text-blue-500 underline">
+            Signup Now
+          </a>
+        </p>
       </form>
     </div>
   );

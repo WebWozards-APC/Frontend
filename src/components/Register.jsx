@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom"; // ✅ import navigate
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
 function Register() {
@@ -10,7 +10,7 @@ function Register() {
     bio: "",
   });
   const [message, setMessage] = useState("");
-  const navigate = useNavigate(); // ✅ hook to navigate
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -22,7 +22,6 @@ function Register() {
       await axios.post("http://localhost:8080/api/users/register", form, {
         withCredentials: false,
       });
-      // ✅ Redirect to blogs after successful registration
       navigate("/blogs");
     } catch (err) {
       setMessage(
@@ -32,12 +31,18 @@ function Register() {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100">
+    <div className="flex justify-center items-center h-[80vh]">
       <form
         onSubmit={handleSubmit}
-        className="bg-white p-8 rounded-2xl shadow-md w-96"
+        className="bg-white text-gray-500 max-w-[350px] mx-4 md:p-6 p-4 text-left text-sm rounded-xl shadow-[0px_0px_10px_0px] shadow-black/10"
       >
-        <h2 className="text-2xl font-bold mb-4 text-center">Register</h2>
+        <h2 className="text-2xl font-semibold mb-6 text-center text-gray-800">
+          Create Account
+        </h2>
+
+        {message && (
+          <p className="text-red-500 mb-2 text-center">{message}</p>
+        )}
 
         <input
           type="text"
@@ -45,7 +50,7 @@ function Register() {
           placeholder="Full Name"
           value={form.name}
           onChange={handleChange}
-          className="w-full p-2 border rounded mb-3"
+          className="w-full border my-2 border-gray-500/30 outline-none rounded-full py-2.5 px-4"
           required
         />
 
@@ -55,7 +60,7 @@ function Register() {
           placeholder="Email"
           value={form.email}
           onChange={handleChange}
-          className="w-full p-2 border rounded mb-3"
+          className="w-full border my-2 border-gray-500/30 outline-none rounded-full py-2.5 px-4"
           required
         />
 
@@ -65,7 +70,7 @@ function Register() {
           placeholder="Password"
           value={form.password}
           onChange={handleChange}
-          className="w-full p-2 border rounded mb-3"
+          className="w-full border my-2 border-gray-500/30 outline-none rounded-full py-2.5 px-4"
           required
         />
 
@@ -74,17 +79,23 @@ function Register() {
           placeholder="Bio"
           value={form.bio}
           onChange={handleChange}
-          className="w-full p-2 border rounded mb-3"
+          className="w-full border my-2 border-gray-500/30 outline-none rounded-xl py-2.5 px-4"
+          rows="3"
         ></textarea>
 
         <button
           type="submit"
-          className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700"
+          className="w-full mb-3 bg-indigo-500 hover:bg-indigo-600/90 active:scale-95 transition py-2.5 rounded-full text-white"
         >
           Register
         </button>
 
-        {message && <p className="mt-3 text-center text-red-500">{message}</p>}
+        <p className="text-center mt-4">
+          Already have an account?{" "}
+          <a href="/login" className="text-blue-500 underline">
+            Login
+          </a>
+        </p>
       </form>
     </div>
   );

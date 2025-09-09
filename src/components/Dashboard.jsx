@@ -20,7 +20,7 @@ function Dashboard() {
           navigate("/login");
           return;
         }
-        // ✅ Fetch blogs of the user
+        // Fetch blogs directly when component loads
         const blogsRes = await axios.get(
           `http://localhost:8080/api/posts/user/${userId}?page=0&size=5`
         );
@@ -46,105 +46,143 @@ function Dashboard() {
     navigate("/add-blog");
   };
 
-  // ✅ Navigate to blog detail page
   const handleBlogClick = (id) => {
     navigate(`/blogs/${id}`);
   };
 
-  // ✅ Delete a blog
   const handleDelete = async (id) => {
     if (!window.confirm("Are you sure you want to delete this blog?")) return;
 
     try {
       await axios.delete(`http://localhost:8080/api/posts/${id}`);
-      setBlogs((prev) => prev.filter((blog) => blog.id !== id)); // remove from state
+      setBlogs((prev) => prev.filter((blog) => blog.id !== id));
     } catch (err) {
       console.error("Error deleting blog:", err);
       alert("Failed to delete blog.");
     }
   };
 
+  // Generate initials for profile pic
+  const getInitials = (name) => {
+    if (!name) return "U";
+    return name
+      .split(" ")
+      .map((word) => word[0])
+      .join("")
+      .toUpperCase()
+      .slice(0, 2);
+  };
+
   return (
-    <div className="max-w-4xl mx-auto py-10 px-6">
-      <h1 className="text-3xl font-bold mb-6">Dashboard</h1>
+    <div className="min-h-screen bg-gray-50">
+      <div className="max-w-4xl mx-auto py-8 px-6">
+        {/* User Profile Section */}
+        <div className="bg-white rounded-lg shadow-sm border p-6 mb-8">
+          <div className="flex items-center justify-between">
+            {/* Profile Info */}
+            <div className="flex items-center space-x-4">
+              {/* Profile Picture */}
+              <div className="w-16 h-16 bg-blue-500 rounded-full flex items-center justify-center text-white text-xl font-bold">
+                {getInitials(name)}
+              </div>
+              
+              {/* User Details */}
+              <div>
+                <h2 className="text-2xl font-bold text-gray-900">{name || "User"}</h2>
+                <p className="text-gray-600">{email || "No email"}</p>
+                <span className="inline-block bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium mt-1">
+                  {role || "No role"}
+                </span>
+              </div>
+            </div>
 
-      {/* User Details */}
-      <div className="mb-6 p-4 bg-gray-100 rounded-lg">
-        <h2 className="text-xl font-semibold mb-2">User Details</h2>
-        <p>
-          <span className="font-medium">Name:</span> {name || "-"}
-        </p>
-        <p>
-          <span className="font-medium">Email:</span> {email || "-"}
-        </p>
-        <p>
-          <span className="font-medium">Role:</span> {role || "-"}
-        </p>
-      </div>
+            {/* Logout Button */}
+            <button
+              onClick={handleLogout}
+              className="bg-red-500 hover:bg-red-600 text-white px-6 py-2 rounded-lg transition-colors"
+            >
+              Logout
+            </button>
+          </div>
+        </div>
 
-      {/* Recent Blogs */}
-      <div className="mb-8">
-        <h2 className="text-xl font-semibold mb-2">📝 Your Recent Blogs</h2>
-        {blogs.length === 0 ? (
-          <p className="text-gray-500">No blogs created yet.</p>
-        ) : (
-          <ul className="space-y-4">
-            {blogs.map((blog) => (
-              <li
-                key={blog.id}
-                className="p-4 bg-white rounded shadow flex justify-between items-start"
+        {/* My Blogs Section - Always Visible */}
+        <div className="bg-white rounded-lg shadow-sm border p-6">
+          {/* Header Section */}
+          <div className="flex items-center space-x-3 mb-6">
+            <div className="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center">
+              <span className="text-white text-lg">📝</span>
+            </div>
+            <div className="flex-1">
+              <h3 className="text-lg font-semibold text-gray-900">My Blogs</h3>
+              <p className="text-gray-600 text-sm">View and manage your blog posts</p>
+            </div>
+            <button
+              onClick={handleCreateBlog}
+              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors"
+            >
+              + Create Blog
+            </button>
+          </div>
+
+          {/* Blogs Content - Always Shown */}
+          {blogs.length === 0 ? (
+            <div className="text-center py-8">
+              <p className="text-gray-500 mb-4">No blogs created yet.</p>
+              <button
+                onClick={handleCreateBlog}
+                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg"
               >
-                {/* Blog Content (clickable) */}
+                Create Your First Blog
+              </button>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {blogs.map((blog) => (
                 <div
-                  onClick={() => handleBlogClick(blog.id)}
-                  className="cursor-pointer hover:bg-gray-50 p-2 rounded flex-1"
+                  key={blog.id}
+                  className="p-4 bg-gray-50 rounded-lg border hover:border-gray-300 transition-colors"
                 >
-                  <h3 className="text-lg font-bold mb-1">{blog.title}</h3>
-                  <p className="text-gray-700 mb-1">
-                    {blog.content?.slice(0, 120)}...
-                  </p>
-                  <p className="text-sm text-gray-500">
-                    Created:{" "}
-                    {blog.createdAt
-                      ? new Date(blog.createdAt).toLocaleDateString()
-                      : "Unknown"}
-                  </p>
+                  <div className="flex justify-between items-start">
+                    {/* Blog Content */}
+                    <div
+                      onClick={() => handleBlogClick(blog.id)}
+                      className="cursor-pointer flex-1 mr-4"
+                    >
+                      <h4 className="text-lg font-semibold text-gray-900 mb-2 hover:text-blue-600 transition-colors">
+                        {blog.title}
+                      </h4>
+                      <p className="text-gray-700 text-sm mb-2">
+                        {blog.content?.slice(0, 120)}...
+                      </p>
+                      <p className="text-xs text-gray-500">
+                        Created: {blog.createdAt
+                          ? new Date(blog.createdAt).toLocaleDateString()
+                          : "Unknown"}
+                      </p>
+                    </div>
+
+                    {/* Action Buttons */}
+                    <div className="flex space-x-2">
+                      <button
+                        onClick={() => navigate(`/edit-blog/${blog.id}`)}
+                        className="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded text-sm transition-colors"
+                      >
+                        Edit
+                      </button>
+                      <button
+                        onClick={() => handleDelete(blog.id)}
+                        className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-sm transition-colors"
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  </div>
                 </div>
-
-                {/* Delete Button */}
-                <button
-                  onClick={() => handleDelete(blog.id)}
-                  className="ml-4 bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 transition"
-                >
-                  Delete
-                </button>
-                {/* Update Button */}
-                <button
-                  onClick={() => navigate(`/edit-blog/${blog.id}`)}
-                  className="ml-2 bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600 transition"
-                >
-                  Update
-                </button>
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
-
-      <div className="flex gap-4">
-        <button
-          onClick={handleCreateBlog}
-          className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition"
-        >
-          + Create Blog
-        </button>
-
-        <button
-          onClick={handleLogout}
-          className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition"
-        >
-          Logout
-        </button>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
