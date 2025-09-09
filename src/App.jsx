@@ -12,8 +12,9 @@ import Login from "./components/Login";
 import Blogs from "./components/Blogs";
 import Register from "./components/Register";
 import Dashboard from "./components/Dashboard";
-import BlogDetail from "./components/BlogDetail"; 
+import BlogDetail from "./components/BlogDetail";
 import AddBlog from "./components/AddBlog"; // ✅ Import AddBlog page
+import EditBlog from "./components/EditBlog";
 
 // Auth wrapper for protected routes
 function RequireAuth({ children }) {
@@ -27,6 +28,9 @@ function RequireAuth({ children }) {
 }
 
 function App() {
+  // Clear localStorage on every app load
+  localStorage.clear();
+
   return (
     <Router>
       <div className="flex flex-col min-h-screen">
@@ -72,6 +76,16 @@ function App() {
               element={
                 <RequireAuth>
                   <AddBlog />
+                </RequireAuth>
+              }
+            />
+
+            {/* ✅ Edit Blog Route */}
+            <Route
+              path="/edit-blog/:id"
+              element={
+                <RequireAuth>
+                  <EditBlog />
                 </RequireAuth>
               }
             />

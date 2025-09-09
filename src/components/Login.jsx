@@ -22,16 +22,22 @@ function Login() {
         password,
       });
 
-      // Accept login if backend returns id and roles
       if (res.data && res.data.id && res.data.roles) {
+        // ✅ Store all required items in localStorage
         localStorage.setItem("userId", res.data.id);
         localStorage.setItem("roles", JSON.stringify(res.data.roles));
         localStorage.setItem("token", "logged-in"); // dummy token for RequireAuth
+        if (res.data.email) {
+          localStorage.setItem("email", res.data.email);
+        }
+        if (res.data.name) {
+          localStorage.setItem("name", res.data.name);
+        }
 
         // Update navbar in case it's listening
         window.dispatchEvent(new Event("storage"));
 
-        setShouldRedirect(true); // ✅ trigger redirect in useEffect
+        setShouldRedirect(true);
       } else {
         setError(res.data?.message || "Unexpected response from server");
         console.error("Login response:", res.data);
@@ -52,7 +58,6 @@ function Login() {
     }
   };
 
-  // ✅ Redirect handled correctly with useEffect
   useEffect(() => {
     if (shouldRedirect) {
       navigate(from, { replace: true });
