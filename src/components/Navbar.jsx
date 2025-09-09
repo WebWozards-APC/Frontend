@@ -16,7 +16,6 @@ function Navbar() {
 
   return (
     <nav className="h-[70px] relative w-full px-6 md:px-16 lg:px-24 xl:px-32 flex items-center justify-between z-20 bg-white text-gray-700 shadow-[0px_4px_25px_0px_#0000000D] transition-all">
-      {/* Logo */}
       <div
         className="text-2xl font-bold text-indigo-600 cursor-pointer"
         onClick={() => navigate("/")}
@@ -24,7 +23,6 @@ function Navbar() {
         Blogify
       </div>
 
-      {/* Desktop Links */}
       <ul className="md:flex hidden items-center gap-10">
         <li>
           <Link className="hover:text-gray-500/80 transition" to="/">
