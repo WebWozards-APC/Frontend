@@ -5,6 +5,7 @@ import {
   Navigate,
   useLocation,
 } from "react-router-dom";
+import { useEffect, useState } from "react";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import Landing from "./components/Landing";
@@ -13,24 +14,53 @@ import Blogs from "./components/Blogs";
 import Register from "./components/Register";
 import Dashboard from "./components/Dashboard";
 import BlogDetail from "./components/BlogDetail";
-import AddBlog from "./components/AddBlog"; // ✅ Import AddBlog page
+import AddBlog from "./components/AddBlog";
 import EditBlog from "./components/EditBlog";
+
+// Clear localStorage on every refresh
+localStorage.clear();
 
 // Auth wrapper for protected routes
 function RequireAuth({ children }) {
   const location = useLocation();
   const token = localStorage.getItem("token");
-  if (!token) {
-    // Redirect to login, save where user was going
+  const [checking, setChecking] = useState(true);
+  const [valid, setValid] = useState(false);
+
+  useEffect(() => {
+    if (!token) {
+      setChecking(false);
+      setValid(false);
+      return;
+    }
+    fetch("http://localhost:8080/api/users/me", {
+      credentials: "include",
+    })
+      .then((res) => {
+        if (res.status === 401) {
+          localStorage.clear();
+          setValid(false);
+        } else {
+          setValid(true);
+        }
+        setChecking(false);
+      })
+      .catch(() => {
+        localStorage.clear();
+        setValid(false);
+        setChecking(false);
+      });
+  }, [token]);
+
+  if (checking) return null;
+
+  if (!valid) {
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
   return children;
 }
 
 function App() {
-  // Clear localStorage on every app load
-  localStorage.clear();
-
   return (
     <Router>
       <div className="flex flex-col min-h-screen">
@@ -70,7 +100,6 @@ function App() {
               }
             />
 
-            {/* ✅ Add Blog Route */}
             <Route
               path="/add-blog"
               element={
@@ -80,7 +109,6 @@ function App() {
               }
             />
 
-            {/* ✅ Edit Blog Route */}
             <Route
               path="/edit-blog/:id"
               element={
