@@ -17,10 +17,7 @@ import BlogDetail from "./components/BlogDetail";
 import AddBlog from "./components/AddBlog";
 import EditBlog from "./components/EditBlog";
 
-// Clear localStorage on every refresh
-localStorage.clear();
 
-// Auth wrapper for protected routes
 function RequireAuth({ children }) {
   const location = useLocation();
   const token = localStorage.getItem("token");

@@ -11,31 +11,53 @@ function Dashboard() {
   const email = localStorage.getItem("email");
   const name = localStorage.getItem("name");
   const roles = JSON.parse(localStorage.getItem("roles"));
-  const role = Array.isArray(roles) ? roles[0] : null;
+  const isAdmin = Array.isArray(roles) && roles.includes("ROLE_ADMIN");
+  const roleLabel = isAdmin ? "Admin" : "User";
 
   useEffect(() => {
     const fetchDashboardData = async () => {
       try {
-        if (!userId || !role) {
+        if (!userId || !roleLabel) {
           navigate("/login");
           return;
         }
-        // Fetch blogs directly when component loads
-        const blogsRes = await axios.get(
-          `http://localhost:8080/api/posts/user/${userId}?page=0&size=5`
-        );
-
-        if (blogsRes.data && blogsRes.data.content) {
-          setBlogs(blogsRes.data.content);
+        let blogsRes;
+        if (isAdmin) {
+          // Admin: fetch all posts
+          blogsRes = await axios.get(
+            `http://localhost:8080/api/posts?page=0&size=100`,
+            {
+              headers: {
+                Authorization: localStorage.getItem("auth")
+                  ? `Basic ${localStorage.getItem("auth")}`
+                  : undefined,
+              },
+              withCredentials: true,
+            }
+          );
+          setBlogs(blogsRes.data.content || []);
         } else {
-          setBlogs([]);
+          // User: fetch only their posts
+          blogsRes = await axios.get(
+            `http://localhost:8080/api/posts/user/${userId}?page=0&size=5`,
+            {
+              headers: {
+                Authorization: localStorage.getItem("auth")
+                  ? `Basic ${localStorage.getItem("auth")}`
+                  : undefined,
+              },
+              withCredentials: true,
+            }
+          );
+          setBlogs(blogsRes.data.content || []);
         }
       } catch (err) {
         console.error("Error fetching dashboard data:", err);
+        setBlogs([]);
       }
     };
     fetchDashboardData();
-  }, [navigate, userId, role]);
+  }, [navigate, userId, roleLabel, isAdmin]);
 
   const handleLogout = () => {
     localStorage.clear();
@@ -54,7 +76,14 @@ function Dashboard() {
     if (!window.confirm("Are you sure you want to delete this blog?")) return;
 
     try {
-      await axios.delete(`http://localhost:8080/api/posts/${id}`);
+      await axios.delete(`http://localhost:8080/api/posts/${id}`, {
+        headers: {
+          Authorization: localStorage.getItem("auth")
+            ? `Basic ${localStorage.getItem("auth")}`
+            : undefined,
+        },
+        withCredentials: true,
+      });
       setBlogs((prev) => prev.filter((blog) => blog.id !== id));
     } catch (err) {
       console.error("Error deleting blog:", err);
@@ -85,13 +114,15 @@ function Dashboard() {
               <div className="w-16 h-16 bg-blue-500 rounded-full flex items-center justify-center text-white text-xl font-bold">
                 {getInitials(name)}
               </div>
-              
+
               {/* User Details */}
               <div>
-                <h2 className="text-2xl font-bold text-gray-900">{name || "User"}</h2>
+                <h2 className="text-2xl font-bold text-gray-900">
+                  {name || "User"}
+                </h2>
                 <p className="text-gray-600">{email || "No email"}</p>
                 <span className="inline-block bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium mt-1">
-                  {role || "No role"}
+                  {roleLabel || "No role"}
                 </span>
               </div>
             </div>
@@ -114,8 +145,14 @@ function Dashboard() {
               <span className="text-white text-lg">📝</span>
             </div>
             <div className="flex-1">
-              <h3 className="text-lg font-semibold text-gray-900">My Blogs</h3>
-              <p className="text-gray-600 text-sm">View and manage your blog posts</p>
+              <h3 className="text-lg font-semibold text-gray-900">
+                {isAdmin ? "All Blogs" : "My Blogs"}
+              </h3>
+              <p className="text-gray-600 text-sm">
+                {isAdmin
+                  ? "View and manage all blog posts"
+                  : "View and manage your blog posts"}
+              </p>
             </div>
             <button
               onClick={handleCreateBlog}
@@ -128,7 +165,11 @@ function Dashboard() {
           {/* Blogs Content - Always Shown */}
           {blogs.length === 0 ? (
             <div className="text-center py-8">
-              <p className="text-gray-500 mb-4">No blogs created yet.</p>
+              <p className="text-gray-500 mb-4">
+                {isAdmin
+                  ? "No blogs found in the app."
+                  : "No blogs created yet."}
+              </p>
               <button
                 onClick={handleCreateBlog}
                 className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg"
@@ -156,20 +197,28 @@ function Dashboard() {
                         {blog.content?.slice(0, 120)}...
                       </p>
                       <p className="text-xs text-gray-500">
-                        Created: {blog.createdAt
+                        Created:{" "}
+                        {blog.createdAt
                           ? new Date(blog.createdAt).toLocaleDateString()
                           : "Unknown"}
                       </p>
+                      {isAdmin && blog.userName && (
+                        <p className="text-xs text-gray-500">
+                          Author: {blog.userName}
+                        </p>
+                      )}
                     </div>
 
                     {/* Action Buttons */}
                     <div className="flex space-x-2">
-                      <button
-                        onClick={() => navigate(`/edit-blog/${blog.id}`)}
-                        className="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded text-sm transition-colors"
-                      >
-                        Edit
-                      </button>
+                      {!isAdmin && (
+                        <button
+                          onClick={() => navigate(`/edit-blog/${blog.id}`)}
+                          className="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded text-sm transition-colors"
+                        >
+                          Edit
+                        </button>
+                      )}
                       <button
                         onClick={() => handleDelete(blog.id)}
                         className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-sm transition-colors"

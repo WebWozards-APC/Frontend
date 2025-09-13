@@ -109,6 +109,27 @@ function BlogDetail() {
     }
   };
 
+  // Fetch user details (e.g., to get userName)
+  useEffect(() => {
+    const fetchUserDetails = async () => {
+      try {
+        const res = await fetch("http://localhost:8080/api/users/me", {
+          headers: {
+            Authorization: `Basic ${localStorage.getItem("auth")}`,
+          },
+          credentials: "include",
+        });
+        if (!res.ok) throw new Error("Failed to fetch user details");
+        const data = await res.json();
+        // Optionally, do something with user details
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    fetchUserDetails();
+  }, []);
+
   if (loading) return <p className="p-6">Loading blog details...</p>;
   if (error) return <p className="p-6 text-red-500">{error}</p>;
   if (!blog) return <p className="p-6">No blog found.</p>;
@@ -161,10 +182,13 @@ function BlogDetail() {
         {/* Heart Like Section */}
         <div className="flex items-center gap-3 mt-6">
           <button
+            type="button"
             onClick={handleLike}
+            disabled={liked}
             aria-label={liked ? "Unlike" : "Like"}
             className="focus:outline-none"
             style={{ background: "none", border: "none", padding: 0 }}
+            title={liked ? "You already liked this post" : "Like this post"}
           >
             <Heart
               className={`w-8 h-8 cursor-pointer transition-colors ${
