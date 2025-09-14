@@ -110,25 +110,25 @@ function BlogDetail() {
   };
 
   // Fetch user details (e.g., to get userName)
-  useEffect(() => {
-    const fetchUserDetails = async () => {
-      try {
-        const res = await fetch("http://localhost:8080/api/users/me", {
-          headers: {
-            Authorization: `Basic ${localStorage.getItem("auth")}`,
-          },
-          credentials: "include",
-        });
-        if (!res.ok) throw new Error("Failed to fetch user details");
-        const data = await res.json();
-        // Optionally, do something with user details
-      } catch (err) {
-        console.error(err);
-      }
-    };
+  // useEffect(() => {
+  //   const fetchUserDetails = async () => {
+  //     try {
+  //       const res = await fetch("http://localhost:8080/api/users/me", {
+  //         headers: {
+  //           Authorization: `Basic ${localStorage.getItem("auth")}`,
+  //         },
+  //         credentials: "include",
+  //       });
+  //       if (!res.ok) throw new Error("Failed to fetch user details");
+  //       const data = await res.json();
+  //       // Optionally, do something with user details
+  //     } catch (err) {
+  //       console.error(err);
+  //     }
+  //   };
 
-    fetchUserDetails();
-  }, []);
+  //   fetchUserDetails();
+  // }, []);
 
   if (loading) return <p className="p-6">Loading blog details...</p>;
   if (error) return <p className="p-6 text-red-500">{error}</p>;

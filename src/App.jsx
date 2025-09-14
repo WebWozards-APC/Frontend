@@ -1,11 +1,4 @@
-import {
-  BrowserRouter as Router,
-  Routes,
-  Route,
-  Navigate,
-  useLocation,
-} from "react-router-dom";
-import { useEffect, useState } from "react";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import Landing from "./components/Landing";
@@ -16,46 +9,7 @@ import Dashboard from "./components/Dashboard";
 import BlogDetail from "./components/BlogDetail";
 import AddBlog from "./components/AddBlog";
 import EditBlog from "./components/EditBlog";
-
-
-function RequireAuth({ children }) {
-  const location = useLocation();
-  const token = localStorage.getItem("token");
-  const [checking, setChecking] = useState(true);
-  const [valid, setValid] = useState(false);
-
-  useEffect(() => {
-    if (!token) {
-      setChecking(false);
-      setValid(false);
-      return;
-    }
-    fetch("http://localhost:8080/api/users/me", {
-      credentials: "include",
-    })
-      .then((res) => {
-        if (res.status === 401) {
-          localStorage.clear();
-          setValid(false);
-        } else {
-          setValid(true);
-        }
-        setChecking(false);
-      })
-      .catch(() => {
-        localStorage.clear();
-        setValid(false);
-        setChecking(false);
-      });
-  }, [token]);
-
-  if (checking) return null;
-
-  if (!valid) {
-    return <Navigate to="/login" state={{ from: location }} replace />;
-  }
-  return children;
-}
+import ProtectedRoute from "./components/ProtectedRoute"; // 👈 Import it
 
 function App() {
   return (
@@ -73,45 +27,45 @@ function App() {
             <Route
               path="/blogs"
               element={
-                <RequireAuth>
+                <ProtectedRoute>
                   <Blogs />
-                </RequireAuth>
+                </ProtectedRoute>
               }
             />
 
             <Route
               path="/blogs/:id"
               element={
-                <RequireAuth>
+                <ProtectedRoute>
                   <BlogDetail />
-                </RequireAuth>
+                </ProtectedRoute>
               }
             />
 
             <Route
               path="/dashboard"
               element={
-                <RequireAuth>
+                <ProtectedRoute>
                   <Dashboard />
-                </RequireAuth>
+                </ProtectedRoute>
               }
             />
 
             <Route
               path="/add-blog"
               element={
-                <RequireAuth>
+                <ProtectedRoute>
                   <AddBlog />
-                </RequireAuth>
+                </ProtectedRoute>
               }
             />
 
             <Route
               path="/edit-blog/:id"
               element={
-                <RequireAuth>
+                <ProtectedRoute>
                   <EditBlog />
-                </RequireAuth>
+                </ProtectedRoute>
               }
             />
           </Routes>
