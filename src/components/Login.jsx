@@ -30,7 +30,7 @@ function Login() {
           localStorage.setItem("email", res.data.email);
         }
         if (res.data.name) {
-          localStorage.setItem("name", res.data.name);
+          localStorage.setItem("name", res.data.name);  
         }
 
         window.dispatchEvent(new Event("storage")); // update navbar
