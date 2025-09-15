@@ -120,7 +120,7 @@ function BlogDetail() {
   //         credentials: "include",
   //       });
   //       if (!res.ok) throw new Error("Failed to fetch user details");
-  //       const data = await res.json();
+  //       const data = awFait res.json();
   //       // Optionally, do something with user details
   //     } catch (err) {
   //       console.error(err);

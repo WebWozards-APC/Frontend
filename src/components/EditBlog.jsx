@@ -5,7 +5,7 @@ import axios from "axios";
 function EditBlog() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const [blog, setBlog] = useState({ title: "", content: "" });
+  const [blog, setBlog] = useState({ title: "", content: "", imgUrl: "" });
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -13,7 +13,11 @@ function EditBlog() {
     axios
       .get(`http://localhost:8080/api/posts/${id}`)
       .then((res) => {
-        setBlog({ title: res.data.title, content: res.data.content });
+        setBlog({
+          title: res.data.title,
+          content: res.data.content,
+          imgUrl: res.data.imgUrl || "",
+        });
         setLoading(false);
       })
       .catch(() => {
@@ -28,11 +32,20 @@ function EditBlog() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    const formData = new FormData();
+    formData.append("title", blog.title);
+    formData.append("content", blog.content);
+    if (blog.imgUrl) formData.append("imgUrl", blog.imgUrl);
+
     try {
-      await axios.put(`http://localhost:8080/api/posts/${id}`, blog);
+      await axios.put(`http://localhost:8080/api/posts/${id}`, formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
       alert("Blog updated!");
       navigate("/dashboard");
-    } catch {
+    } catch (err) {
+      console.error(err);
       alert("Failed to update blog.");
     }
   };
@@ -59,6 +72,13 @@ function EditBlog() {
           placeholder="Content"
           rows={8}
           required
+        />
+        <input
+          name="imgUrl"
+          value={blog.imgUrl}
+          onChange={handleChange}
+          className="w-full border p-2 rounded"
+          placeholder="Image URL"
         />
         <button
           type="submit"
