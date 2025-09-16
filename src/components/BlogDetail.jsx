@@ -141,13 +141,13 @@ function BlogDetail() {
           <img
             src={blog.imgUrl}
             alt={blog.title}
-            className="w-full h-72 md:h-96 object-cover"
+            className="w-full h-72 md:h-120 object-cover"
           />
         )}
       </div>
 
       <div className="max-w-3xl mx-auto px-5 py-10">
-        <div className="flex flex-wrap items-center justify-between text-sm text-gray-600 mb-6">
+        {/* <div className="flex flex-wrap items-center justify-between text-sm text-gray-600 mb-6">
           <span>
             Written by <strong>{blog.userName || "Anonymous"}</strong>
           </span>
@@ -156,7 +156,7 @@ function BlogDetail() {
               ? new Date(blog.createdAt).toDateString()
               : "Unknown date"}
           </span>
-        </div>
+        </div> */}
 
         <motion.h1
           initial={{ opacity: 0, y: 20 }}
@@ -179,7 +179,7 @@ function BlogDetail() {
           </motion.p>
         ))}
 
-        {/* Heart Like Section */}
+        {/* Heart Like Section
         <div className="flex items-center gap-3 mt-6">
           <button
             type="button"
@@ -201,7 +201,7 @@ function BlogDetail() {
           <span className="text-gray-600">
             {likeCount === 1 ? "like" : "likes"}
           </span>
-        </div>
+        </div> */}
 
         {/* Comments Section */}
         <div className="mt-12">

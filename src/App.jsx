@@ -9,7 +9,7 @@ import Dashboard from "./components/Dashboard";
 import BlogDetail from "./components/BlogDetail";
 import AddBlog from "./components/AddBlog";
 import EditBlog from "./components/EditBlog";
-import ProtectedRoute from "./components/ProtectedRoute"; // 👈 Import it
+import ProtectedRoute from "./components/ProtectedRoute"; 
 
 function App() {
   return (
